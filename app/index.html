@@ -1,0 +1,446 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chat</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #000000 0%, #000000 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 800px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            overflow: hidden;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2);
+        }
+
+        .header {
+            background: rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .header h1 {
+            color: white;
+            font-size: 2.5em;
+            font-weight: 300;
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+        }
+
+        .status {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9em;
+        }
+
+        .join-section {
+            padding: 40px;
+            text-align: center;
+        }
+
+        .join-section h2 {
+            color: white;
+            margin-bottom: 30px;
+            font-weight: 300;
+            font-size: 1.5em;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .input-field {
+            position: relative;
+        }
+
+        .input-field input {
+            width: 100%;
+            padding: 15px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50px;
+            color: white;
+            font-size: 16px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .input-field input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .input-field input:focus {
+            border-color: rgba(255, 255, 255, 0.5);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .join-btn {
+            background: linear-gradient(45deg, #ff6b6b, #ff8e8e);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 50px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 25px rgba(255, 107, 107, 0.3);
+        }
+
+        .join-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(255, 107, 107, 0.4);
+        }
+
+        .chat-section {
+            height: 70vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .messages-container {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            max-height: calc(70vh - 80px);
+        }
+
+        .messages-container::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .messages-container::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .messages-container::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 3px;
+        }
+
+        .message {
+            display: flex;
+            align-items: flex-start;
+            margin: 10px 0;
+            animation: messageSlide 0.3s ease-out;
+            gap: 15px;
+        }
+
+        .message-user {
+            min-width: 80px;
+            color: #4facfe;
+            font-weight: bold;
+            font-size: 0.9em;
+            padding: 8px 12px;
+            background: rgba(19, 102, 175, 0.1);
+            border-radius: 12px;
+            text-align: center;
+            border: 1px solid rgba(54, 62, 68, 0.3);
+        }
+
+        .message-content {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 12px 18px;
+            border-radius: 18px;
+            color: white;
+            border-left: 3px solid #ff6b6b;
+            word-wrap: break-word;
+        }
+
+        @keyframes messageSlide {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .message-form {
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.1);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .message-input-container {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .message-input {
+            flex: 1;
+            padding: 12px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 25px;
+            color: white;
+            font-size: 16px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .message-input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .message-input:focus {
+            border-color: rgba(255, 255, 255, 0.5);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .send-btn {
+            background: linear-gradient(45deg, #4facfe, #00f2fe);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(79, 172, 254, 0.3);
+        }
+
+        .send-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(79, 172, 254, 0.4);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .connection-status {
+            padding: 10px;
+            text-align: center;
+            font-size: 0.9em;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .connected {
+            color: #4ade80;
+        }
+
+        .disconnected {
+            color: #f87171;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                width: 95%;
+                margin: 10px;
+            }
+
+            .join-section {
+                padding: 30px 20px;
+            }
+
+            .header h1 {
+                font-size: 2em;
+            }
+
+            .message-input-container {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .message-input {
+                width: 100%;
+            }
+
+            .send-btn {
+                width: 100%;
+            }
+
+            .message {
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .message-user {
+                min-width: unset;
+                align-self: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Chat</h1>
+            <div class="status" id="connectionStatus">Ready to connect</div>
+        </div>
+
+        <div id="joinSection" class="join-section">
+            <h2 style="font-family: 'Trebuchet MS', sans-serif; font-size: 22px; font-weight: bold; padding: 10px 20px; border-radius: 8px; color: white; cursor: pointer;">Join a Chat Room</h2>
+            <form id="joinForm">
+                <div class="input-group">
+                    <div class="input-field">
+                        <input type="text" id="roomId" placeholder=" Enter Room ID" required style="font-family: Arial, sans-serif; font-size: 16px; font-weight: bold;">
+                    </div>
+                    <div class="input-field">
+                        <input type="text" id="userId" placeholder="Enter Your Username" required style="font-family: Arial, sans-serif; font-size: 16px; font-weight: bold;">
+                    </div>
+                    <div class="input-field">
+                        <input type="text" id="pass" placeholder="Password" required style="font-family: Arial, sans-serif; font-size: 16px; font-weight: bold;">
+                    </div>
+                </div>
+                <button type="submit" class="join-btn" style="font-family: Arial, sans-serif; font-size: 16px; font-weight: bold;">Join Chat</button>
+            </form>
+        </div>
+
+        <div id="chatSection" class="chat-section hidden">
+            <div class="messages-container">
+                <ul id="messages"></ul>
+            </div>
+            <div class="message-form">
+                <form id="chatForm" onsubmit="sendMessage(event)">
+                    <div class="message-input-container">
+                        <input type="text" id="messageText" class="message-input" autocomplete="off" required>
+                        <button type="submit" class="send-btn">Send</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let ws;
+        const connectionStatus = document.getElementById('connectionStatus');
+
+        document.getElementById("joinForm").onsubmit = async function(event) {
+            event.preventDefault();
+
+            const roomId = document.getElementById("roomId").value.trim();
+            const userId = document.getElementById("userId").value.trim();
+
+            const formdata={UserId: document.getElementById('userId').value.trim(), roomId: document.getElementById('roomId').value.trim(),
+                password: document.getElementById('pass').value.trim()
+            };
+            try {
+                const response = await fetch('/join-room', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formdata)
+                });
+                
+                const data = await response.json();
+                
+                
+                if (!response.ok) {
+                    alert("Error Joining Room");
+                    return;
+                } 
+                
+            } catch (error) {
+                console.error('Error:', error);  
+                alert('Failed to connect to server');
+                return;
+
+            }
+            if (!roomId || !userId) {
+                alert('Please fill in both Room ID and Username');
+                return;
+            }
+
+            connectionStatus.textContent = 'Connecting...';
+            connectionStatus.className = 'status';
+
+            ws = new WebSocket(`ws://localhost:8000/ws/${roomId}/${userId}`);
+
+            ws.onopen = function() {
+                connectionStatus.textContent = `Connected as ${userId} in room ${roomId}`;
+                connectionStatus.className = 'status connected';
+                
+                document.getElementById("joinSection").classList.add("hidden");
+                document.getElementById("chatSection").classList.remove("hidden");
+                
+                // Focus on message input
+                document.getElementById("messageText").focus();
+            };
+
+            ws.onmessage = function(event) {
+                const messageData = JSON.parse(event.data);
+                const messages = document.getElementById('messages');
+                const message = document.createElement('li');
+                message.className = 'message';
+                
+                // Create user ID display
+                const userDiv = document.createElement('div');
+                userDiv.className = 'message-user';
+                userDiv.textContent = messageData.user_id || 'Unknown';
+                
+                // Create message content
+                const contentDiv = document.createElement('div');
+                contentDiv.className = 'message-content';
+                contentDiv.textContent = messageData.content;
+                
+                // Append both to message
+                message.appendChild(userDiv);
+                message.appendChild(contentDiv);
+                messages.appendChild(message);
+                
+                // Auto scroll to bottom
+                messages.scrollTop = messages.scrollHeight;
+            };
+
+            ws.onclose = function() {
+                connectionStatus.textContent = 'Disconnected';
+                connectionStatus.className = 'status disconnected';
+            };
+
+            ws.onerror = function() {
+                connectionStatus.textContent = 'Connection failed';
+                connectionStatus.className = 'status disconnected';
+                alert('Failed to connect to the server. Please check if the server is running.');
+            };
+        };
+
+        function sendMessage(event) {
+            event.preventDefault();
+            const input = document.getElementById("messageText");
+            
+            if (input.value.trim() && ws && ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({ content: input.value }));
+                input.value = '';
+            }
+        }
+
+        // Allow Enter key to send messages
+        document.getElementById("messageText").addEventListener('keypress', function(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                sendMessage(event);
+            }
+        });
+    </script>
+</body>
+</html>
